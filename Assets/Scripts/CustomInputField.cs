@@ -14,7 +14,7 @@ public class CustomInputField : InputField
 
         if (isAfterSent)
         {
-            Debug.Log(lastCaretPos);
+            
             MoveTextEnd(false);
             this.selectionAnchorPosition = this.lastCaretPos;
             this.selectionFocusPosition = this.lastCaretPos;
