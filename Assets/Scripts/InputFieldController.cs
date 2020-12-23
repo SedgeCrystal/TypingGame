@@ -5,11 +5,16 @@ using UnityEngine.UI;
 
 public class InputFieldController : MonoBehaviour
 {
-    // Start is called before the first frame update
+ 
+    
     CustomInputField customInputField;
     GameDirector gameDirector;
+
+    //Image determine background color
     Image inputFieldImage;
-    public string exmStr = "aaaa";
+
+    //example text to compare
+    public string exmStr;
     
     void Start()
     {
@@ -21,9 +26,13 @@ public class InputFieldController : MonoBehaviour
         this.inputFieldImage = this.GetComponent<Image>();
     }
 
+    //This is called when inputText is changed.
+    //if input text and exmStr are same, color is green.
+    //if input text is wrong, color is red.
+    //if input text can be correct, color is black.
     public void OnTextChanged()
     {
-        if (this.isMatchText())
+        if (this.IsMatchText())
         {
             inputFieldImage.color = Color.green;
             return;
@@ -49,19 +58,19 @@ public class InputFieldController : MonoBehaviour
         }
     }
 
+
+    //This is called when Enter is pressed.
     public void OnEndEditText()
     {
         
-        if (this.isMatchText())
+        if (this.IsMatchText())
         {
             gameDirector.isCorrect = true;
             this.customInputField.text = "";
         }
-        else
-        {
-            gameDirector.isCorrect = false;
-        }
-        
+
+        //After Enter is pressed, inputField become deactive.
+        //To improve this, inputField have to be activated.
         this.customInputField.ActivateInputField();
 
         this.customInputField.lastCaretPos = this.customInputField.caretPosition;
@@ -70,7 +79,7 @@ public class InputFieldController : MonoBehaviour
         
     }
 
-    bool isMatchText()
+    bool IsMatchText()
     {
         return string.Equals(this.customInputField.text,this.exmStr);
     }
