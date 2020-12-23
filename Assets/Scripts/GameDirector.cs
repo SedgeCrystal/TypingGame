@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,10 @@ public class GameDirector : MonoBehaviour
     Text timerText;
     Text lineText;
     Text titleText;
+    Text countdownText;
+    
+    //GameObject to deactive typing game before the game start.
+    GameObject gamePanel;
 
     //time until start
     float time;
@@ -32,6 +37,11 @@ public class GameDirector : MonoBehaviour
     //name of chosen txt file
     string title;
 
+    //should start the game
+    bool shouldStart;
+
+    //countdown timer before game starts
+    float countdownTimer;
    
     private void Awake()
     {
@@ -39,10 +49,12 @@ public class GameDirector : MonoBehaviour
         // get information from SelectScene
 
         this.exampleTextList = new List<string>() { "aaa", "bbb","ccc","ddd","eee"};
-        MAX_LINE = exampleTextList.Count;
+        this.MAX_LINE = exampleTextList.Count;
 
-        this.time = -3;
+        this.time = 0;
         this.title = "Sample";
+        this.shouldStart = false;
+        this.countdownTimer = 3;
     }
 
 
@@ -64,12 +76,20 @@ public class GameDirector : MonoBehaviour
         GameObject titleTextObject = GameObject.FindGameObjectWithTag("TitleText");
         this.titleText = titleTextObject.GetComponent<Text>();
 
+        this.gamePanel = GameObject.FindGameObjectWithTag("GamePanel");
+
+        GameObject countdownTextObject = GameObject.FindGameObjectWithTag("CountdownText");
+        this.countdownText = countdownTextObject.GetComponent<Text>();
+
 
         //send Infomation about example text to ExamapleTextControlloer and InputFieldController
-        SendExampleTextLineInfo();
+        this.SendExampleTextLineInfo();
 
         //set title
         this.titleText.text = this.title;
+
+        //unitl game start, game is deactive.
+        this.gamePanel.SetActive(false);
     }
 
     
@@ -79,17 +99,12 @@ public class GameDirector : MonoBehaviour
         this.UpdateTimer();
         this.UpdateLine();
 
-
-        //todo CountDown before start the game
-        if (time < 0)
-        {
-
-            return; 
-        }
-
+        
+        this.Countdown();
+        this.ActivateGame();
         this.CheckIsCorrect();
 
-       
+
     }
 
     //send Infomation about example text to ExamapleTextControlloer and InputFieldController
@@ -123,7 +138,7 @@ public class GameDirector : MonoBehaviour
         }
 
         //change next line
-        line++;
+        this.line++;
 
         //check all line has typed
         if (this.line >= MAX_LINE)
@@ -138,6 +153,42 @@ public class GameDirector : MonoBehaviour
 
         
         this.isCorrect = false;
+
+    }
+
+    //
+    void ActivateGame()
+    {
+
+        this.gamePanel.SetActive(this.shouldStart);
+        if (!this.shouldStart)
+        {
+            this.time = 0;
+        }
+
+    }
+
+
+    void Countdown()
+    {
+        if (this.shouldStart)
+        {
+            return;
+        }
+        this.countdownTimer -= Time.deltaTime;
+
+
+
+        if (this.countdownTimer < 0)
+        {
+
+            this.shouldStart = true;
+            this.countdownText.text = "";
+            return;
+        }
+        this.countdownText.text = Math.Ceiling(countdownTimer).ToString("F0");
+
+       
 
     }
 }
