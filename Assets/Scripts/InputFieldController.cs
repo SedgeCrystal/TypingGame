@@ -34,7 +34,7 @@ public class InputFieldController : MonoBehaviour
     {
         if (this.IsMatchText())
         {
-            inputFieldImage.color = Color.green;
+            this.inputFieldImage.color = Color.green;
             return;
         }
 
@@ -42,18 +42,18 @@ public class InputFieldController : MonoBehaviour
         int l = str.Length;
         if(l > exmStr.Length)
         {
-            inputFieldImage.color = Color.red;
+            this.inputFieldImage.color = Color.red;
             return;
         }
 
         string exmSubStr = exmStr.Substring(0, l);
         if (str.Equals(exmSubStr))
         {
-            inputFieldImage.color = Color.black;
+            this.inputFieldImage.color = Color.black;
         }
         else
         {
-            inputFieldImage.color = Color.red;
+            this.inputFieldImage.color = Color.red;
             
         }
     }
@@ -65,7 +65,7 @@ public class InputFieldController : MonoBehaviour
         
         if (this.IsMatchText())
         {
-            gameDirector.isCorrect = true;
+            this.gameDirector.isCorrect = true;
             this.customInputField.text = "";
         }
 

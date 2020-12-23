@@ -26,14 +26,14 @@ public class CustomInputField : InputField
             return;
         }
 
-        MoveTextEnd(false);
+        base.MoveTextEnd(false);
 
         //fix caret position 
         this.selectionAnchorPosition = this.lastCaretPos;
         this.selectionFocusPosition = this.lastCaretPos;
 
         
-        isAfterSent = false;
+        this.isAfterSent = false;
 
     }
 }
