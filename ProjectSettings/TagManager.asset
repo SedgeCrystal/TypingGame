@@ -3,7 +3,15 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - GameDirector
+  - InputField
+  - ExampleText
+  - TitleText
+  - TimerText
+  - LineText
+  - GamePanel
+  - CountdownText
   layers:
   - Default
   - TransparentFX
