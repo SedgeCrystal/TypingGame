@@ -7,6 +7,9 @@ TagManager:
   - GameDirector
   - InputField
   - ExampleText
+  - TitleText
+  - TimerText
+  - LineText
   layers:
   - Default
   - TransparentFX
