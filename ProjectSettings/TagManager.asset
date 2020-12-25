@@ -12,6 +12,7 @@ TagManager:
   - LineText
   - GamePanel
   - CountdownText
+  - NoticeText
   layers:
   - Default
   - TransparentFX
