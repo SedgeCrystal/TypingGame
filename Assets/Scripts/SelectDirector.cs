@@ -51,7 +51,7 @@ public class SelectDirector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        Debug.Log(this.state);
         CheckPath();
         UpdateNoticeText();
        
@@ -77,8 +77,7 @@ public class SelectDirector : MonoBehaviour
         
 
         Debug.Log(this.exmList.Count);
-        Debug.Log(this.exmList[0]);
-        Debug.Log(this.exmList[1]);
+        
 
         this.CheckExmList();
 
@@ -96,7 +95,7 @@ public class SelectDirector : MonoBehaviour
         }
         try
         {
-
+            
             using (StreamReader sr = new StreamReader(path))
             {
                 while (sr.Peek() != -1)
@@ -110,6 +109,7 @@ public class SelectDirector : MonoBehaviour
                     this.exmList.Add(line);
                 }
             }
+            
         }
         catch (Exception e)
         {
@@ -121,7 +121,12 @@ public class SelectDirector : MonoBehaviour
     
     void CheckExmList()
     {
-        if(this.exmList.Count == 0)
+        if (state == State.NotExist)
+        {
+            return;
+        }
+
+        if (this.exmList.Count == 0)
         {
             this.state = State.Empty;
             return;
@@ -148,7 +153,7 @@ public class SelectDirector : MonoBehaviour
 
     void CheckPath()
     {
-        if(this.state == State.Exception)
+        if(this.state != State.OK && this.state !=State.NotExist)
         {
             return;
         }
@@ -172,6 +177,11 @@ public class SelectDirector : MonoBehaviour
             case State.NotExist: message = "THIS PATH IS NOT POITING TEXT FILE!";
                 break;
             case State.Exception: message = this.errMsg;
+                break;
+            case State.Empty: message = "THIS FILE IS EMPTY";
+                break;
+            case State.OverMaxChar:
+                message = "THIS FILE CONTAINS TOO MANY CHARACTERS";
                 break;
         }
 
