@@ -13,6 +13,7 @@ TagManager:
   - GamePanel
   - CountdownText
   - NoticeText
+  - SelectDirector
   layers:
   - Default
   - TransparentFX

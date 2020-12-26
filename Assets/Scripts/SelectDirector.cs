@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Windows.Forms;
+using UnityEngine.SceneManagement;
 
 public class SelectDirector : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class SelectDirector : MonoBehaviour
     InputField inputField;
     
     // Start is called before the first frame update
-    string path;
+    public string path;
 
     //the state of this Scene
     //0:unable to start
@@ -26,7 +27,7 @@ public class SelectDirector : MonoBehaviour
 
     OpenFileDialog openFileDialog;
 
-    List<string> exmList;
+    public List<string> exmList;
 
 
     void Start()
@@ -46,6 +47,9 @@ public class SelectDirector : MonoBehaviour
         this.openFileDialog.CheckFileExists = true;
 
         this.exmList = new List<string>();
+
+
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -83,7 +87,7 @@ public class SelectDirector : MonoBehaviour
 
         if(this.state == State.OK)
         {
-            Debug.Log("OK");
+            SceneManager.LoadScene("GameScene");
         }
     }
 
