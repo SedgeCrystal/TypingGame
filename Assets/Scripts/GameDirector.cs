@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,13 +49,23 @@ public class GameDirector : MonoBehaviour
         this.line = 0;
         // get information from SelectScene
 
-        this.exampleTextList = new List<string>() { "aaa", "bbb","ccc","ddd","eee"};
+        GameObject selectDirectorObject = GameObject.FindGameObjectWithTag("SelectDirector");
+        SelectDirector selectDirector = selectDirectorObject.GetComponent<SelectDirector>();
+
+        this.exampleTextList = selectDirector.exmList;
         this.MAX_LINE = exampleTextList.Count;
 
+        string path = selectDirector.path;
+        this.title = Path.GetFileName(path);
+
+        GameObject.Destroy(selectDirectorObject);
+
         this.time = 0;
-        this.title = "Sample";
+
         this.shouldStart = false;
         this.countdownTimer = 3;
+
+
     }
 
 
