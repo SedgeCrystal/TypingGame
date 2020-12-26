@@ -14,10 +14,21 @@ public class SelectDirector : MonoBehaviour
     // Start is called before the first frame update
     string path;
 
-    int state;
+    //the state of this Scene
+    //0:unable to start
+    //1:able to start
+    //2:error occur while read file
+    State state;
     Text noticeText;
+    string errMsg;
+
+    const int MAX_CHAR = 50;
 
     OpenFileDialog openFileDialog;
+
+    List<string> exmList;
+
+
     void Start()
     {
         path = "C:\\";
@@ -34,7 +45,7 @@ public class SelectDirector : MonoBehaviour
         
         this.openFileDialog.CheckFileExists = true;
 
-        
+        this.exmList = new List<string>();
     }
 
     // Update is called once per frame
@@ -43,8 +54,7 @@ public class SelectDirector : MonoBehaviour
 
         CheckPath();
         UpdateNoticeText();
-
-
+       
     }
 
     public void OnClickBrowseButton()
@@ -60,6 +70,76 @@ public class SelectDirector : MonoBehaviour
         
     } 
 
+    public void OnClickStartButton()
+    {
+        this.ReadText();
+        
+        
+
+        Debug.Log(this.exmList.Count);
+        Debug.Log(this.exmList[0]);
+        Debug.Log(this.exmList[1]);
+
+        this.CheckExmList();
+
+        if(this.state == State.OK)
+        {
+            Debug.Log("OK");
+        }
+    }
+
+    void ReadText()
+    {
+        if (state == State.NotExist)
+        {
+            return;
+        }
+        try
+        {
+
+            using (StreamReader sr = new StreamReader(path))
+            {
+                while (sr.Peek() != -1)
+                {
+                    string line = sr.ReadLine();
+                    line = line.Trim();
+                    if(line.Length == 0)
+                    {
+                        continue;
+                    }
+                    this.exmList.Add(line);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            state = State.Exception;
+            this.errMsg = $"{e.GetType()} has occurred.";
+        }
+
+    }
+    
+    void CheckExmList()
+    {
+        if(this.exmList.Count == 0)
+        {
+            this.state = State.Empty;
+            return;
+        }
+
+        foreach(string exm in exmList)
+        {
+            if(exm.Length > SelectDirector.MAX_CHAR)
+            {
+                this.state = State.OverMaxChar;
+                return;
+            }
+            {
+
+            }
+        }
+    }
+
     public void OnEndPathEdit()
     {
         this.path = inputField.text;
@@ -68,14 +148,19 @@ public class SelectDirector : MonoBehaviour
 
     void CheckPath()
     {
+        if(this.state == State.Exception)
+        {
+            return;
+        }
+
         if (!File.Exists(this.path))
         {
-            this.state = 0;
+            this.state = State.NotExist;
             return;
         }
 
         string ext = Path.GetExtension(this.path);
-        this.state = (ext == ".txt") ? 1 : 0;
+        this.state = (ext == ".txt") ? State.OK : State.NotExist;
     }
 
     void UpdateNoticeText()
@@ -84,11 +169,22 @@ public class SelectDirector : MonoBehaviour
         string message = "";
         switch (this.state)
         {
-            case 0: message = "THIS PATH IS NOT POITING TEXT FILE!";
+            case State.NotExist: message = "THIS PATH IS NOT POITING TEXT FILE!";
+                break;
+            case State.Exception: message = this.errMsg;
                 break;
         }
 
         this.noticeText.text = message;
     }
    
+}
+
+enum State
+{
+    OK,
+    NotExist,
+    Exception,
+    Empty,
+    OverMaxChar
 }
