@@ -56,8 +56,7 @@ public class SelectDirector : MonoBehaviour
 
         this.exmList = new List<string>();
 
-        //This object have to give information about selected file to GameDirector.
-        DontDestroyOnLoad(gameObject);
+       
     }
 
 
@@ -91,6 +90,7 @@ public class SelectDirector : MonoBehaviour
         {
             PlayerPrefs.SetString("Path", this.path);
             PlayerPrefs.Save();
+            SceneManager.sceneLoaded += LoadGameScene;
             SceneManager.LoadScene("GameScene");
         }
     }
@@ -229,7 +229,20 @@ public class SelectDirector : MonoBehaviour
         this.state = State.InvalidPath;
     }
 
+    private void LoadGameScene(Scene next, LoadSceneMode mode)
+    {
+        GameObject gameDirectorObject = GameObject.FindGameObjectWithTag("GameDirector");
 
+        GameDirector gameDirector = gameDirectorObject.GetComponent<GameDirector>();
+
+        Debug.Log(this.exmList.Count);
+
+        gameDirector.title = Path.GetFileName(this.path);
+        gameDirector.exampleTextList = this.exmList;
+
+
+        SceneManager.sceneLoaded -= LoadGameScene;
+    }
 
 
 }

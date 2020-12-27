@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameDirector : MonoBehaviour
@@ -27,7 +28,7 @@ public class GameDirector : MonoBehaviour
     float time;
 
     //line number in exampleText which should be being input
-    int line;
+    public int line;
     
     //the number of line in example text
     int MAX_LINE;
@@ -36,7 +37,7 @@ public class GameDirector : MonoBehaviour
     public List<string> exampleTextList;
 
     //name of chosen txt file
-    string title;
+    public string title;
 
     //should start the game
     bool shouldStart;
@@ -47,25 +48,13 @@ public class GameDirector : MonoBehaviour
     private void Awake()
     {
         this.line = 0;
-        // get information from SelectScene
-
-        GameObject selectDirectorObject = GameObject.FindGameObjectWithTag("SelectDirector");
-        SelectDirector selectDirector = selectDirectorObject.GetComponent<SelectDirector>();
-
-        this.exampleTextList = selectDirector.exmList;
-        this.MAX_LINE = exampleTextList.Count;
-
-        string path = selectDirector.path;
-        this.title = Path.GetFileName(path);
-
-        GameObject.Destroy(selectDirectorObject);
-
+        Debug.Log(this.line);
         this.time = 0;
 
         this.shouldStart = false;
         this.countdownTimer = 3;
 
-
+       
     }
 
 
@@ -93,6 +82,10 @@ public class GameDirector : MonoBehaviour
         this.countdownText = countdownTextObject.GetComponent<Text>();
 
 
+        this.line = 0;
+        this.MAX_LINE = exampleTextList.Count;
+        //Debug.Log(this.MAX_LINE);
+       
         //send Infomation about example text to ExamapleTextControlloer and InputFieldController
         this.SendExampleTextLineInfo();
 
@@ -114,13 +107,17 @@ public class GameDirector : MonoBehaviour
         this.Countdown();
         this.ActivateGame();
         this.CheckIsCorrect();
-
+        this.CheckEnd();
 
     }
 
     //send Infomation about example text to ExamapleTextControlloer and InputFieldController
     void SendExampleTextLineInfo()
     {
+        if(line >= MAX_LINE)
+        {
+            return;
+        }
         this.inputFieldController.exmStr = this.exampleTextList[line];
         this.exampleTextController.SetText(exampleTextList, line);
     }
@@ -200,6 +197,38 @@ public class GameDirector : MonoBehaviour
         this.countdownText.text = Math.Ceiling(countdownTimer).ToString("F0");
 
        
+
+    }
+
+    void CheckEnd()
+    {
+        if(this.line != this.MAX_LINE)
+        {
+            return;
+        }
+        SceneManager.sceneLoaded += LoadResultScene;
+        SceneManager.LoadScene("ResultScene");
+    }
+
+    void LoadResultScene(Scene next, LoadSceneMode mode)
+    {
+        GameObject resultDirectorObject = GameObject.FindGameObjectWithTag("ResultDirector");
+        Debug.Log(resultDirectorObject);
+        ResultDirector resultDirector = resultDirectorObject.GetComponent<ResultDirector>();
+       
+        int sum = 0;
+        foreach (string exm in this.exampleTextList)
+        {
+            sum += exm.Length;
+
+        }
+
+        resultDirector.Title = this.title;
+        resultDirector.Time = this.time;
+        resultDirector.Wps = this.time / sum;
+        resultDirector.ExmList = this.exampleTextList;
+
+        SceneManager.sceneLoaded -= LoadResultScene;
 
     }
 }
