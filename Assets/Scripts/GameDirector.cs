@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameDirector : MonoBehaviour
@@ -114,7 +115,7 @@ public class GameDirector : MonoBehaviour
         this.Countdown();
         this.ActivateGame();
         this.CheckIsCorrect();
-
+        this.CheckEnd();
 
     }
 
@@ -200,6 +201,37 @@ public class GameDirector : MonoBehaviour
         this.countdownText.text = Math.Ceiling(countdownTimer).ToString("F0");
 
        
+
+    }
+
+    void CheckEnd()
+    {
+        if(this.line != this.MAX_LINE)
+        {
+            return;
+        }
+        SceneManager.sceneLoaded += LoadResultScene;
+        SceneManager.LoadScene("ResultScene");
+    }
+
+    void LoadResultScene(Scene next, LoadSceneMode mode)
+    {
+        GameObject resultDirectorObject = GameObject.FindGameObjectWithTag("ResultDirector");
+        Debug.Log(resultDirectorObject);
+        ResultDirector resultDirector = resultDirectorObject.GetComponent<ResultDirector>();
+        Debug.Log(resultDirector);
+        int sum = 0;
+        foreach (string exm in this.exampleTextList)
+        {
+            sum += exm.Length;
+
+        }
+
+        resultDirector.Title = this.title;
+        resultDirector.Time = this.time;
+        resultDirector.Wps = this.time / sum;
+
+        SceneManager.sceneLoaded -= LoadResultScene;
 
     }
 }
