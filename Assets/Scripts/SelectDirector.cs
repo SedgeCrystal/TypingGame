@@ -103,6 +103,13 @@ public class SelectDirector : MonoBehaviour
         {
             return;
         }
+
+        //If exmList is not empty, exmList is assigned new List<string>
+        if(this.exmList.Count > 0)
+        {
+            this.exmList = new List<string>();
+        }
+
         try
         {
 
@@ -141,6 +148,8 @@ public class SelectDirector : MonoBehaviour
         {
             return;
         }
+
+        
 
         //Check exmList is empty
         if (this.exmList.Count == 0)
@@ -211,8 +220,10 @@ public class SelectDirector : MonoBehaviour
 
     public void OnClickBrowseButton()
     {
+        var dr = this.openFileDialog.ShowDialog();
 
-        if (this.openFileDialog.ShowDialog() == DialogResult.OK)
+        
+        if (dr == DialogResult.OK)
         {
             this.ChangePath(this.openFileDialog.FileName);
         }
