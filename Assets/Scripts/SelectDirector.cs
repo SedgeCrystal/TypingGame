@@ -13,7 +13,7 @@ public class SelectDirector : MonoBehaviour
     InputField inputField;
 
     //path to type
-    public string path;
+    string path;
 
     //the state of this Scene
     //State is defined at bottom of this file.
@@ -30,7 +30,7 @@ public class SelectDirector : MonoBehaviour
     OpenFileDialog openFileDialog;
 
     //List of example text to type.
-    public List<string> exmList;
+    List<string> exmList;
 
 
     void Start()
@@ -90,7 +90,8 @@ public class SelectDirector : MonoBehaviour
         {
             PlayerPrefs.SetString("Path", this.path);
             PlayerPrefs.Save();
-            SceneManager.sceneLoaded += LoadGameScene;
+
+            SceneManager.sceneLoaded += GameSceneLoaded;
             SceneManager.LoadScene("GameScene");
         }
     }
@@ -102,6 +103,13 @@ public class SelectDirector : MonoBehaviour
         {
             return;
         }
+
+        //If exmList is not empty, exmList is assigned new List<string>
+        if(this.exmList.Count > 0)
+        {
+            this.exmList = new List<string>();
+        }
+
         try
         {
 
@@ -110,7 +118,11 @@ public class SelectDirector : MonoBehaviour
                 while (sr.Peek() != -1)
                 {
                     string line = sr.ReadLine();
+
+                    //trim space at start and end of line.
                     line = line.Trim();
+
+                    //if line is empty, line is not added in exmList.
                     if (line.Length == 0)
                     {
                         continue;
@@ -136,6 +148,8 @@ public class SelectDirector : MonoBehaviour
         {
             return;
         }
+
+        
 
         //Check exmList is empty
         if (this.exmList.Count == 0)
@@ -206,8 +220,10 @@ public class SelectDirector : MonoBehaviour
 
     public void OnClickBrowseButton()
     {
+        var dr = this.openFileDialog.ShowDialog();
 
-        if (this.openFileDialog.ShowDialog() == DialogResult.OK)
+        
+        if (dr == DialogResult.OK)
         {
             this.ChangePath(this.openFileDialog.FileName);
         }
@@ -229,24 +245,24 @@ public class SelectDirector : MonoBehaviour
         this.state = State.InvalidPath;
     }
 
-    private void LoadGameScene(Scene next, LoadSceneMode mode)
+
+    //Before game starts, the information about file is passed.
+    private void GameSceneLoaded(Scene next, LoadSceneMode mode)
     {
         GameObject gameDirectorObject = GameObject.FindGameObjectWithTag("GameDirector");
-
         GameDirector gameDirector = gameDirectorObject.GetComponent<GameDirector>();
 
-        Debug.Log(this.exmList.Count);
+        gameDirector.File = Path.GetFileName(this.path);
+        gameDirector.exmList = this.exmList;
 
-        gameDirector.title = Path.GetFileName(this.path);
-        gameDirector.exampleTextList = this.exmList;
-
-
-        SceneManager.sceneLoaded -= LoadGameScene;
+        //remove this function
+        SceneManager.sceneLoaded -= GameSceneLoaded;
     }
 
 
 }
 
+//Enum of state used in SelectDirector
 enum State
 {
     OK,

@@ -9,13 +9,13 @@ using UnityEngine.UI;
 public class GameDirector : MonoBehaviour
 {
     //result of checking inputText
-    public bool isCorrect = false;
+    private bool isCorrect = false;
 
     //other GameObject Controllers
     InputFieldController inputFieldController;
     ExampleTextController exampleTextController;
     
-    //Text which this class controll
+    //Texts which this class controll
     Text timerText;
     Text lineText;
     Text titleText;
@@ -28,27 +28,30 @@ public class GameDirector : MonoBehaviour
     float time;
 
     //line number in exampleText which should be being input
-    public int line;
+    int line;
     
     //the number of line in example text
     int MAX_LINE;
 
     //List of example text;
-    public List<string> exampleTextList;
+    public List<string> exmList;
 
     //name of chosen txt file
-    public string title;
+    private string file;
 
     //should start the game
     bool shouldStart;
 
     //countdown timer before game starts
     float countdownTimer;
-   
+
+    public bool IsCorrect { get => isCorrect; set => isCorrect = value; }
+    public string File { get => file; set => file = value; }
+
     private void Awake()
-    {
+    {   
+        //initialize property.
         this.line = 0;
-        Debug.Log(this.line);
         this.time = 0;
 
         this.shouldStart = false;
@@ -59,21 +62,42 @@ public class GameDirector : MonoBehaviour
 
 
     void Start()
-    {   
+    {
         //set GameObject Components in this Scene.
-        GameObject inputFieldObject = GameObject.FindGameObjectWithTag("InputField");
-        this.inputFieldController = inputFieldObject.GetComponent<InputFieldController>(); 
+        SetComponents();
+
+        
+        this.MAX_LINE = exmList.Count;
+        
        
+        //send Infomation about example text to ExamapleTextControlloer and InputFieldController
+        this.SendExampleTextLineInfo();
+
+        //set title
+        this.titleText.text = this.File;
+
+        //unitl game start, game is deactive.
+        this.gamePanel.SetActive(false);
+    }
+
+
+    //set GameObject Components in this Scene.
+    void SetComponents()
+    {
+        
+        GameObject inputFieldObject = GameObject.FindGameObjectWithTag("InputField");
+        this.inputFieldController = inputFieldObject.GetComponent<InputFieldController>();
+
         GameObject exampleTextObject = GameObject.FindGameObjectWithTag("ExampleText");
         this.exampleTextController = exampleTextObject.GetComponent<ExampleTextController>();
- 
+
         GameObject timerTextObject = GameObject.FindGameObjectWithTag("TimerText");
         this.timerText = timerTextObject.GetComponent<Text>();
 
         GameObject lineTextObject = GameObject.FindGameObjectWithTag("LineText");
         this.lineText = lineTextObject.GetComponent<Text>();
 
-        GameObject titleTextObject = GameObject.FindGameObjectWithTag("TitleText");
+        GameObject titleTextObject = GameObject.FindGameObjectWithTag("FileNameText");
         this.titleText = titleTextObject.GetComponent<Text>();
 
         this.gamePanel = GameObject.FindGameObjectWithTag("GamePanel");
@@ -81,25 +105,11 @@ public class GameDirector : MonoBehaviour
         GameObject countdownTextObject = GameObject.FindGameObjectWithTag("CountdownText");
         this.countdownText = countdownTextObject.GetComponent<Text>();
 
-
-        this.line = 0;
-        this.MAX_LINE = exampleTextList.Count;
-        //Debug.Log(this.MAX_LINE);
-       
-        //send Infomation about example text to ExamapleTextControlloer and InputFieldController
-        this.SendExampleTextLineInfo();
-
-        //set title
-        this.titleText.text = this.title;
-
-        //unitl game start, game is deactive.
-        this.gamePanel.SetActive(false);
     }
 
-    
     void Update()
     {
-
+        this.CheckInputEsc();
         this.UpdateTimer();
         this.UpdateLine();
 
@@ -107,8 +117,18 @@ public class GameDirector : MonoBehaviour
         this.Countdown();
         this.ActivateGame();
         this.CheckIsCorrect();
-        this.CheckEnd();
 
+        this.CheckEnd();
+    }
+
+
+    //if Esc is pressed, quit the game.
+    void CheckInputEsc()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("SelectScene");
+        }
     }
 
     //send Infomation about example text to ExamapleTextControlloer and InputFieldController
@@ -118,8 +138,8 @@ public class GameDirector : MonoBehaviour
         {
             return;
         }
-        this.inputFieldController.exmStr = this.exampleTextList[line];
-        this.exampleTextController.SetText(exampleTextList, line);
+        this.inputFieldController.exmStr = this.exmList[line];
+        this.exampleTextController.SetText(exmList, line);
     }
 
     //update time and timerText
@@ -132,7 +152,7 @@ public class GameDirector : MonoBehaviour
     //update lineText
     void UpdateLine()
     {
-        this.lineText.text = string.Format("{0:00}/{1:00}", line, MAX_LINE);
+        this.lineText.text = string.Format("{0:000}/{1:000}", line, MAX_LINE);
     }
 
     //check isCorrect
@@ -140,7 +160,7 @@ public class GameDirector : MonoBehaviour
     void CheckIsCorrect()
     {
         //do nothing if isCorrect is false
-        if (!this.isCorrect)
+        if (!this.IsCorrect)
         {
             return;
         }
@@ -148,23 +168,15 @@ public class GameDirector : MonoBehaviour
         //change next line
         this.line++;
 
-        //check all line has typed
-        if (this.line >= MAX_LINE)
-        {
-            //todo ResultScene
-        }
-        else
-        {
-            this.SendExampleTextLineInfo();
+    
+        this.SendExampleTextLineInfo();
 
-        }
-
-        
-        this.isCorrect = false;
+        this.IsCorrect = false;
 
     }
 
-    //
+
+    //while countdown, the game doesn't start.
     void ActivateGame()
     {
 
@@ -179,14 +191,16 @@ public class GameDirector : MonoBehaviour
 
     void Countdown()
     {
+        //if game has started, do nothing.
         if (this.shouldStart)
         {
             return;
         }
+
         this.countdownTimer -= Time.deltaTime;
 
 
-
+        //if countdown finish, game starts.
         if (this.countdownTimer < 0)
         {
 
@@ -199,36 +213,40 @@ public class GameDirector : MonoBehaviour
        
 
     }
-
+    //if game ends, load ResultScene.
     void CheckEnd()
     {
-        if(this.line != this.MAX_LINE)
+        if (this.line < this.MAX_LINE)
         {
             return;
         }
-        SceneManager.sceneLoaded += LoadResultScene;
+        SceneManager.sceneLoaded += ResultSceneLoaded;
         SceneManager.LoadScene("ResultScene");
     }
 
-    void LoadResultScene(Scene next, LoadSceneMode mode)
+
+    //Before showing results, the information about game is passed.
+    void ResultSceneLoaded(Scene next, LoadSceneMode mode)
     {
         GameObject resultDirectorObject = GameObject.FindGameObjectWithTag("ResultDirector");
         Debug.Log(resultDirectorObject);
         ResultDirector resultDirector = resultDirectorObject.GetComponent<ResultDirector>();
        
         int sum = 0;
-        foreach (string exm in this.exampleTextList)
+        foreach (string exm in this.exmList)
         {
             sum += exm.Length;
 
         }
 
-        resultDirector.Title = this.title;
-        resultDirector.Time = this.time;
-        resultDirector.Wps = this.time / sum;
-        resultDirector.ExmList = this.exampleTextList;
 
-        SceneManager.sceneLoaded -= LoadResultScene;
+        //imfortaion is passed to ResultDirector.
+        resultDirector.Title = this.File;
+        resultDirector.Time = this.time;
+        resultDirector.Wps = sum / this.time;
+        resultDirector.ExmList = this.exmList;
+
+        SceneManager.sceneLoaded -= ResultSceneLoaded;
 
     }
 }

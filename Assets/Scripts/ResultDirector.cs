@@ -42,8 +42,8 @@ public class ResultDirector : MonoBehaviour
     {
         StringBuilder sb = new StringBuilder();
         sb.AppendLine(this.title);
-        sb.AppendLine($"time:{time,3:F3}");
-        sb.AppendLine($"wps:{wps,3:F3}");
+        sb.AppendLine($"time:{time,7:F3}");
+        sb.AppendLine($"wps:{wps,7:F3}");
 
 
         this.resultText.text = sb.ToString(); ;
@@ -59,12 +59,12 @@ public class ResultDirector : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            SceneManager.sceneLoaded += LoadGameScene;
+            SceneManager.sceneLoaded += GameSceneLoaded;
             SceneManager.LoadScene("GameScene");
         }
     }
 
-    private void LoadGameScene(Scene next, LoadSceneMode mode)
+    private void GameSceneLoaded(Scene next, LoadSceneMode mode)
     {
         GameObject gameDirectorObject = GameObject.FindGameObjectWithTag("GameDirector");
         
@@ -72,10 +72,10 @@ public class ResultDirector : MonoBehaviour
 
         
 
-        gameDirector.title = this.title;
-        gameDirector.exampleTextList = this.exmList;
-        gameDirector.line = 0;
+        gameDirector.File = this.title;
+        gameDirector.exmList = this.exmList;
+        
 
-        SceneManager.sceneLoaded -= LoadGameScene;
+        SceneManager.sceneLoaded -= GameSceneLoaded;
     }
 }
