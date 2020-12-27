@@ -65,7 +65,7 @@ public class InputFieldController : MonoBehaviour
         
         if (this.IsMatchText())
         {
-            this.gameDirector.isCorrect = true;
+            this.gameDirector.IsCorrect = true;
             this.customInputField.text = "";
         }
 
