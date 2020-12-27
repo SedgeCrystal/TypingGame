@@ -109,7 +109,7 @@ public class GameDirector : MonoBehaviour
 
     void Update()
     {
-
+        this.CheckInputEsc();
         this.UpdateTimer();
         this.UpdateLine();
 
@@ -119,6 +119,16 @@ public class GameDirector : MonoBehaviour
         this.CheckIsCorrect();
 
         this.CheckEnd();
+    }
+
+
+    //if Esc is pressed, quit the game.
+    void CheckInputEsc()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("SelectScene");
+        }
     }
 
     //send Infomation about example text to ExamapleTextControlloer and InputFieldController
